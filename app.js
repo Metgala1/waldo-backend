@@ -10,10 +10,23 @@ const app = express();
 app.use(helmet());
 
 // CORS setup
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://waldo-frontend-three.vercel.app"
+];
+
 app.use(cors({
-    origin:  "https://waldo-frontend-three.vercel.app", 
-    credentials: true,
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // allow curl/postman or server-side requests
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy does not allow access from: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
 }));
+
 
 
 // Body parser
