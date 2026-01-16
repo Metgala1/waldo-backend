@@ -1,39 +1,41 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const morgan = require("morgan");   // <-- added
+const morgan = require("morgan");
 const imageRouter = require("./src/routes/image.routes");
+require("dotenv").config();
 
 const app = express();
 
-// Security middleware
+// Security
 app.use(helmet());
 
-// CORS setup
+// --- FIXED + IMPROVED CORS ---
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://waldo-frontend-three.vercel.app"
+    "http://localhost:5173",
+    "https://waldo-frontend-three.vercel.app"
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // allow curl/postman or server-side requests
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy does not allow access from: ${origin}`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log("❌ Blocked by CORS:", origin);
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
 }));
 
-
-
-// Body parser
+// JSON parser
 app.use(express.json());
 
-// Request logger (Morgan)
-app.use(morgan("dev"));   // <-- logs all requests nicely in terminal
+// Request logger
+app.use(morgan("dev"));
 
 // Routes
 app.use("/", imageRouter);
