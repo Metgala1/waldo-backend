@@ -11,7 +11,7 @@ app.use(helmet());
 
 // CORS setup
 app.use(cors({
-    origin: ["http://localhost:5173" , "https://waldo-frontend-three.vercel.app"], 
+    origin:  "https://waldo-frontend-three.vercel.app", 
     credentials: true,
 }));
 
